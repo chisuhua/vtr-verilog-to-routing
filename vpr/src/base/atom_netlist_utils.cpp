@@ -709,11 +709,13 @@ void absorb_buffer_luts(AtomNetlist& netlist, int verbosity) {
     //TODO: absorb inverter LUTs?
 }
 
+//Helen's changes begin
 bool is_buffer_lut(const AtomNetlist& netlist, const AtomBlockId blk) {
     if (netlist.block_type(blk) == AtomBlockType::BLOCK) {
         const t_model* blk_model = netlist.block_model(blk);
 
-        if (blk_model->name != std::string(MODEL_NAMES)) return false;
+	//Both .name (MODEL_NAMES) and stratixiv_lcell_comb are LUT models
+        if ((blk_model->name != std::string(MODEL_NAMES)) && (blk_model->name != std::string("stratixiv_lcell_comb"))) return false;
 
         auto input_ports = netlist.block_input_ports(blk);
         auto output_ports = netlist.block_output_ports(blk);
@@ -741,6 +743,7 @@ bool is_buffer_lut(const AtomNetlist& netlist, const AtomBlockId blk) {
                 //It is a single-input single-output LUT, we now
                 //inspect it's truth table
                 //
+	/*
                 const auto& truth_table = netlist.block_truth_table(blk);
 
                 VTR_ASSERT_MSG(truth_table.size() == 1, "One truth-table row");
@@ -764,11 +767,14 @@ bool is_buffer_lut(const AtomNetlist& netlist, const AtomBlockId blk) {
                     //It is a buffer LUT
                     return true;
                 }
+	*/
+		return true;
             }
         }
     }
     return false;
 }
+//Helen's changes end
 
 bool remove_buffer_lut(AtomNetlist& netlist, AtomBlockId blk, int verbosity) {
     //General net connectivity, numbers equal pin ids
